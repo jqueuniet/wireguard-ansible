@@ -52,12 +52,13 @@
       
     - name: Install keys for non-debian dist
       apt_key:
-        keyserver: keyring.debian.org
+        keyserver: keys.gnupg.net
         id: "{{ item }}"
       loop: "{{ wireguard_repo_keys }}"
       when:
         - ansible_distribution == 'Debian'
         - not(ansible_lsb['id'] == 'Debian')
+
 
     - name : Add WireGuard repository to Debian
       apt_repository:
