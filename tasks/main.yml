@@ -173,6 +173,14 @@
         - ansible_os_family == 'Debian'
         - not(ansible_lsb['id'] == 'Raspbian')
 
+
+    - name: Install kernel headers on Raspbian
+      package:
+        name: raspberrypi-kernel-headers
+      when:
+        - ansible_os_family == 'Debian'
+        - ansible_lsb['id'] == 'Raspbian'
+
 ##  Allow WireGuard service, add network interface on firewall and enable masquerading
 
     - name: Allow WireGuard service for FirewallD public zone
