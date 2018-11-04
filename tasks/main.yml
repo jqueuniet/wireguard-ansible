@@ -123,8 +123,14 @@
         state: directory
 
 
-    - name: Generate WireGuard private and public keys
-      shell: umask 077 && wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+    - name: Generate WireGuard private key
+      shell: wg genkey > /etc/wireguard/privatekey
+      creates: /etc/wireguard/privatekey
+
+
+    - name: Generate WireGuard public key
+      shell: cat /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+      creates: /etc/wireguard/publickey
 
 
     - name: Register WireGuard private key as a variable
