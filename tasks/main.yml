@@ -169,7 +169,9 @@
 
     - name: Install kernel headers on Debian/Ubuntu
       shell: apt install -y linux-headers-`uname -r`
-      when: ansible_os_family == 'Debian'
+      when:
+        - ansible_os_family == 'Debian'
+        - not(ansible_lsb['id'] == 'Raspbian')
 
 ##  Allow WireGuard service, add network interface on firewall and enable masquerading
 
