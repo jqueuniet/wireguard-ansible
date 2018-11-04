@@ -4,28 +4,25 @@
 #
 #
 
---- 
+---
 ## Install WireGuard prerequests for CentOS/RHEL 7
 
     - name: Upgrade system packages on CentOS/RHEL
-      yum: 
+      yum:
         name: "*"
-        state: latest
         update_cache: yes
       when: ansible_os_family == 'RedHat'
 
 
-    - name : Add Extra Packages for Enterprise Linux (EPEL) repository
+    - name: Add Extra Packages for Enterprise Linux (EPEL) repository
       yum:
         name: epel-release
-        state: latest
       when: ansible_os_family == 'RedHat'
 
 
-    - name : Install kernel headers on CentOS/RHEL
+    - name: Install kernel headers on CentOS/RHEL
       yum:
         name: kernel-devel
-        state: latest
       when: ansible_os_family == 'RedHat'
 
 ## Install WireGuard prerequests for Debian/Ubuntu
@@ -33,7 +30,7 @@
     - name: Install Python 2 if not exist
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
       when: ansible_os_family == 'Debian'
- 
+
 
     - name: Upgrade system packages on Debian/Ubuntu
       apt:
@@ -49,7 +46,7 @@
         dest: /etc/yum.repos.d/wireguard.repo
       when: ansible_os_family == 'RedHat'
 
-      
+
     - name: Install keys for non-debian dist
       apt_key:
         keyserver: keys.gnupg.net
@@ -60,7 +57,7 @@
         - not(ansible_lsb['id'] == 'Debian')
 
 
-    - name : Add WireGuard repository to Debian
+    - name: Add WireGuard repository to Debian
       apt_repository:
         repo: deb http://deb.debian.org/debian/ unstable main
         state: present
@@ -76,7 +73,7 @@
       when: ansible_distribution == 'Debian'
 
 
-    - name : Add WireGuard repository to Ubuntu
+    - name: Add WireGuard repository to Ubuntu
       apt_repository:
         repo: ppa:wireguard/wireguard
         state: present
@@ -87,9 +84,8 @@
     - name: Install WireGuard
       package:
         name: "{{ item }}"
-        state: latest
       with_items:
-        - wireguard-dkms 
+        - wireguard-dkms
         - wireguard-tools
 
 ## Configure system environment
@@ -106,7 +102,6 @@
     - name: Install FirewallD
       package:
         name: firewalld
-        state: latest
 
 
     - name: Enable and start FirewallD service
@@ -116,7 +111,7 @@
         enabled: yes
 
 ## Configure WireGuard
-    
+
     - name: Create WireGuard configurations directory
       file:
         dest: /etc/wireguard
@@ -176,7 +171,7 @@
     - name: Check running kernel on Debian
       shell: "uname -a | awk '{print $7}'"
       changed_when: False
-      register: running_kernel
+      register: running_kernel_version
       when: ansible_distribution == 'Debian'
 
 
@@ -195,7 +190,7 @@
       when:
         - ansible_os_family == 'Debian'
         - not(ansible_lsb['id'] == 'Raspbian')
-        - not(running_kernel.output in installed_kernels.output)
+        - not(running_kernel_version.output in installed_kernels.output)
 
 
     - name: Wait for reboot to start on slow devices
@@ -209,14 +204,15 @@
 ## Install current kernel headers on Debian/Ubuntu
 
     - name: Install kernel headers on Debian/Ubuntu
-      shell: apt install -y linux-headers-`uname -r`
+      apt:
+        name: "linux-headers-{{ arch_map[ansible_architecture] }}"
       when:
         - ansible_os_family == 'Debian'
         - not(ansible_lsb['id'] == 'Raspbian')
 
 
     - name: Install kernel headers on Raspbian
-      package:
+      apt:
         name: raspberrypi-kernel-headers
       when:
         - ansible_os_family == 'Debian'
@@ -249,7 +245,7 @@
         state: enabled
         permanent: yes
         immediate: yes
-        
+
 
 ## Enable WireGuard kernel module and start service
 
@@ -269,4 +265,3 @@
         name: wg-quick@wg0
         state: started
         enabled: yes
-
