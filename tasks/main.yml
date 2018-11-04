@@ -155,11 +155,44 @@
 
 ## Reboot server to load latest kernel
 
+
+    - name: Check installed kernel on Debian/Ubuntu
+      shell: "dpkg --list | grep linux-image-[0-9] | grep '^ii' | awk '{print $3}' | grep -Eo '[0-9]\\.[0-9]+\\.[0-9]+-[0-9]+'"
+      changed_when: False
+      register: installed_kernels
+      when:
+        - ansible_os_family == 'Debian'
+        - not(ansible_lsb['id'] == 'Raspbian')
+
+
+    - name: Check running kernel on Debian
+      shell: "uname -a | awk '{print $7}'"
+      changed_when: False
+      register: running_kernel
+      when: ansible_distribution == 'Debian'
+
+
+    - name: Check running kernel on Ubuntu
+      shell: "uname -a | grep -Eo '[0-9]\\.[0-9]+\\.[0-9]+-[0-9]+'"
+      changed_when: False
+      register: running_kernel
+      when: ansible_distribution == 'Ubuntu'
+
+
     - name: Reboot server
       shell: sleep 2 && /sbin/reboot
       async: 1
       poll: 0
       ignore_errors: true
+      when:
+        - ansible_os_family == 'Debian'
+        - not(ansible_lsb['id'] == 'Raspbian')
+        - not(running_kernel.output in installed_kernels.output)
+
+
+    - name: Wait for reboot to start on slow devices
+      pause:
+        seconds: 5
 
 
     - name: Waiting for hosts to come back
