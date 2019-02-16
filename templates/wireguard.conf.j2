@@ -1,5 +1,5 @@
 [Interface]
-Address = {{ wireguard_interface_ip }}/{{ wireguard_network_mask }}
+Address = {{ wireguard_interface_addresses[ansible_host] }}/{{ wireguard_network_mask }}
 ListenPort = {{ wireguard_port }}
 PrivateKey = {{ wg_privatekey['content'] | b64decode }}
 
@@ -8,6 +8,6 @@ PrivateKey = {{ wg_privatekey['content'] | b64decode }}
 [Peer]
 PublicKey = {{ hostvars[host]['wireguard_public_key'] | trim }}
 Endpoint = {{ hostvars[host]['inventory_hostname'] }}:{{ wireguard_port }}
-AllowedIPs = {{ hostvars[host]['wireguard_interface_ip'] }}/32
+AllowedIPs = {{ wireguard_interface_addresses[host] }}/32
 {% endif %}
 {% endfor %}
