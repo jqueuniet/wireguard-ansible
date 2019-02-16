@@ -1,6 +1,0 @@
----
-- hosts: "{{hosts_group|default('all')}}"
-  vars_files:
-    - 'vars/main.yml'
-  roles:
-    - "{{role_name|default('wireguard-ansible')}}"
