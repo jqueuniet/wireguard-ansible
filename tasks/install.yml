@@ -1,0 +1,31 @@
+---
+- name: Install the relevant kernel headers
+  apt:
+    name: linux-headers-amd64
+
+- name: Add WireGuard repository to Debian
+  apt_repository:
+    repo: deb http://deb.debian.org/debian/ unstable main
+    state: present
+    filename: unstable-wireguard.list
+    update_cache: yes
+  when: ansible_distribution == 'Debian'
+
+- name: Configure APT to use unstable Debian repository with low priority
+  copy:
+    src: limit-unstable
+    dest: /etc/apt/preferences.d/limit-unstable
+  when: ansible_distribution == 'Debian'
+
+- name: Add WireGuard repository to Ubuntu
+  apt_repository:
+    repo: ppa:wireguard/wireguard
+    state: present
+    update_cache: yes
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install WireGuard
+  apt:
+    name:
+    - wireguard-dkms
+    - wireguard-tools

@@ -1,0 +1,37 @@
+---
+- name: Enable packet forwording for IPv4
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_file: /etc/sysctl.d/wireguard.conf
+    state: present
+    reload: yes
+
+- name: Create WireGuard configurations directory
+  file:
+    dest: /etc/wireguard
+    state: directory
+
+- name: Generate WireGuard private key
+  shell: wg genkey > /etc/wireguard/privatekey
+  args:
+    creates: /etc/wireguard/privatekey
+
+- name: Generate WireGuard public key
+  shell: cat /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+  args:
+    creates: /etc/wireguard/publickey
+
+- name: Register WireGuard private key as a variable
+  slurp:
+    src: /etc/wireguard/privatekey
+  register: wg_privatekey
+
+- name: Register WireGuard public key as a variable
+  slurp:
+    src: /etc/wireguard/publickey
+  register: wg_publickey
+
+- name: Export the public key as fact for peer list generation
+  set_fact:
+    wireguard_public_key: "{{ wg_publickey.content|b64decode if wg_publickey.encoding == 'base64' else wg_publickey.content }}"

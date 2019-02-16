@@ -1,15 +1,11 @@
 galaxy_info:
-  author: 'Mina Alber'
-  description: 'Ansible Playbook for WireGuard deployment on CentOS 7'
+  author: 'Johann Queuniet'
+  description: 'Ansible Playbook for WireGuard deployment on Debian/Ubuntu'
   license: 'GPLv3'
   min_ansible_version: 2.5
   platforms:
-   - name: EL
-     versions:
-      - 7
    - name: Debian
      versions:
-      - jessie
       - stretch
    - name: Ubuntu
      versions:

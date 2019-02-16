@@ -1,0 +1,11 @@
+---
+- block:
+  - name: Tentative test if the wireguard module is loadable
+    modprobe:
+      name: wireguard
+  rescue:
+    - name: Module is unloadable, reboot may be required to switch to latest kernel
+      reboot:
+    - name: Definitive test if the wireguard module is loadable
+      modprobe:
+        name: wireguard
