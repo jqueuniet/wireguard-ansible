@@ -7,3 +7,9 @@
     group: root
     mode: 0600
   notify: restart WireGuard
+
+- name: Enable the VPN at boot-time
+  systemd:
+    name: wg-quick@wg0
+    enabled: yes
+    state: started
